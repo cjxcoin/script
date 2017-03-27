@@ -171,11 +171,10 @@ contract CJXToken is owned, token, job {
         Transfer(this, target, mintedAmount);
     }
     
-    function grantJob(address target, uint256 mintedAmount) onlyOwner {
-        balanceOf[target] += mintedAmount;
-        totalSupply += mintedAmount;
-        Transfer(0, this, mintedAmount);
-        Transfer(this, target, mintedAmount);
+    function grantJob(address target, string _jobid, string _key, uint256 _grantAmount) onlyOwner {
+        balanceOf[target] += _grantAmount;
+        AnnouceCompleted(owner, _jobid, _key, "completed", "");
+        Transfer(owner, msg.sender, _grantAmount);
     }
 
     function freezeAccount(address target, bool freeze) onlyOwner {
