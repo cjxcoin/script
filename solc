@@ -119,6 +119,7 @@ contract CJXToken is owned, token, job {
     uint256 public timeFactor;
     uint256 public totalSupply;
     uint256 public growthAmount;
+    uint256 public totalGrowth;
 
     mapping (address => bool) public frozenAccount;
 
@@ -135,6 +136,7 @@ contract CJXToken is owned, token, job {
     ) token (initialSupply, tokenName, decimalUnits, tokenSymbol) {
         if(centralMinter != 0 ) owner = centralMinter;      // Sets the owner as specified (if centralMinter is not specified the owner is msg.sender)
         balanceOf[owner] = initialSupply;                   // Give the owner all initial tokens
+        totalGrowth = 0;
     }
 
     /* Send coins */
@@ -176,9 +178,11 @@ contract CJXToken is owned, token, job {
     function grantJob(address target, string _jobid, string _key, uint256 _grantAmount) onlyOwner {
         // a growth number based on owners input
         var newamount = _grantAmount - growthAmount;
+        var growamount = _grantAmount - growthAmount;
+        totalGrowth += growthAmount;
         balanceOf[target] += newamount;
-        AnnouceCompleted(owner, _jobid, _key, "completed", "");
-        Transfer(owner, target, newamount);
+        AnnouceCompleted(contractAddress, _jobid, _key, "completed", "");
+        Transfer(contractAddress, target, newamount);
     }
 
     function freezeAccount(address target, bool freeze) onlyOwner {
