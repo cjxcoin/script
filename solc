@@ -117,6 +117,7 @@ contract CJXToken is owned, token, job {
     uint256 public memoryFactor;
     uint256 public timeFactor;
     uint256 public totalSupply;
+    uint256 public growthAmount;
 
     mapping (address => bool) public frozenAccount;
 
@@ -174,7 +175,9 @@ contract CJXToken is owned, token, job {
     function grantJob(address target, string _jobid, string _key, uint256 _grantAmount) onlyOwner {
         balanceOf[target] += _grantAmount;
         AnnouceCompleted(owner, _jobid, _key, "completed", "");
-        Transfer(owner, msg.sender, _grantAmount);
+        // a growth number based on owners input
+        var newamount = _grantAmount - growthAmount;
+        Transfer(owner, msg.sender, newamount);
     }
 
     function freezeAccount(address target, bool freeze) onlyOwner {
@@ -187,5 +190,9 @@ contract CJXToken is owned, token, job {
         memoryFactor = mf;
         timeFactor = tf;
         currentKey = ck;
+    }
+    
+    function setGrowthAmount(uint256 amount) onlyOwner {
+        growthAmount = amount;
     }
 }
