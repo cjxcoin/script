@@ -111,6 +111,12 @@ function create(address _from, uint256 _maxvalue, string _inval, string _hashval
 
 }
 
+function destroy(address _from, address _to, string _jobid, string _inval, string _hashval) {
+    
+    AnnouceDestroy(msg.sender, _to, _jobid, _inval, _hashval); 
+
+}
+
 }
 
 
