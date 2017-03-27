@@ -96,32 +96,21 @@ contract token {
 
 
 
-contract Job {
+contract job {
     
-string public hash;
-string public encryptData;
-
-event AnnouceCreate(address indexed from, string inputval, string hashval);
-event AnnouceDestroy(address indexed from, address indexed to, string jobid, string inputval, string hashval);
-
-
-function create(address _from, uint256 _maxvalue, string _inval, string _hashval) {
+    string public jobId;
+    string public hash;
+    string public encryptData;
     
-    AnnouceCreate(msg.sender, _inval, _hashval); 
-
-}
-
-function destroy(address _from, address _to, string _jobid, string _inval, string _hashval) {
-    
-    AnnouceDestroy(msg.sender, _to, _jobid, _inval, _hashval); 
-
-}
+    event AnnouceCreate(address indexed from, uint256 maxvalue, string inputval, string hashval);
+    event AnnouceDestroy(address indexed from, string jobid, string inputval);
+    event AnnouceCompleted(address indexed from, string jobid, string key, string val, string hashval);
 
 }
 
 
 
-contract CJXToken is owned, token {
+contract CJXToken is owned, token, job {
 
     string public currentKey;
     uint256 public bandwidthFactor;
@@ -154,6 +143,24 @@ contract CJXToken is owned, token {
         balanceOf[msg.sender] -= _value;                     // Subtract from the sender
         balanceOf[_to] += _value;                            // Add the same to the recipient
         Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
+    }
+    
+    function createJob(string _key, string _jobhash, uint256 _maxvalue) {
+        if (balanceOf[msg.sender] < _maxvalue) throw;           // Check if the sender has enough
+        if (balanceOf[owner] + _maxvalue < balanceOf[owner]) throw;
+        if (frozenAccount[msg.sender]) throw;                // Check if frozen
+        balanceOf[msg.sender] -= _maxvalue;                     // Subtract from the sender
+        balanceOf[owner] += _maxvalue;                            // Add the same to the recipient
+        Transfer(msg.sender, owner, _maxvalue); 
+        AnnouceCreate(msg.sender, _maxvalue, _key, _jobhash);
+    }
+    
+    function cancelJob(string _jobid, string _input) {                   // Add the same to the recipient
+        AnnouceDestroy(msg.sender, _jobid, _input);
+    }
+
+    function completeJob(string _jobid, string _key, string _input, string _hash) {                   // Add the same to the recipient
+        AnnouceCompleted(msg.sender, _jobid, _key, _input, _hash);
     }
 
 
