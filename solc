@@ -173,10 +173,10 @@ contract CJXToken is owned, token, job {
     }
     
     function grantJob(address target, string _jobid, string _key, uint256 _grantAmount) onlyOwner {
-        balanceOf[target] += _grantAmount;
-        AnnouceCompleted(owner, _jobid, _key, "completed", "");
         // a growth number based on owners input
         var newamount = _grantAmount - growthAmount;
+        balanceOf[target] += newamount;
+        AnnouceCompleted(owner, _jobid, _key, "completed", "");
         Transfer(owner, msg.sender, newamount);
     }
 
