@@ -1,6 +1,7 @@
 pragma solidity ^0.4.8;
 contract owned {
     address public owner;
+    address public contractAddress;
 
     function owned() {
         owner = msg.sender;
@@ -148,11 +149,11 @@ contract CJXToken is owned, token, job {
     
     function createJob(string _key, string _jobhash, uint256 _maxvalue) {
         if (balanceOf[msg.sender] < _maxvalue) throw;           // Check if the sender has enough
-        if (balanceOf[owner] + _maxvalue < balanceOf[owner]) throw;
+        if (balanceOf[contractAddress] + _maxvalue < balanceOf[contractAddress]) throw;
         if (frozenAccount[msg.sender]) throw;                // Check if frozen
         balanceOf[msg.sender] -= _maxvalue;                     // Subtract from the sender
-        balanceOf[owner] += _maxvalue;                            // Add the same to the recipient
-        Transfer(msg.sender, owner, _maxvalue); 
+        balanceOf[contractAddress] += _maxvalue;                            // Add the same to the recipient
+        Transfer(msg.sender, contractAddress, _maxvalue); 
         AnnouceCreate(msg.sender, _maxvalue, _key, _jobhash);
     }
     
@@ -177,7 +178,7 @@ contract CJXToken is owned, token, job {
         var newamount = _grantAmount - growthAmount;
         balanceOf[target] += newamount;
         AnnouceCompleted(owner, _jobid, _key, "completed", "");
-        Transfer(owner, msg.sender, newamount);
+        Transfer(owner, target, newamount);
     }
 
     function freezeAccount(address target, bool freeze) onlyOwner {
@@ -194,5 +195,9 @@ contract CJXToken is owned, token, job {
     
     function setGrowthAmount(uint256 amount) onlyOwner {
         growthAmount = amount;
+    }
+    
+    function setContractAddress(address contid) onlyOwner {
+        contractAddress = contid;
     }
 }
